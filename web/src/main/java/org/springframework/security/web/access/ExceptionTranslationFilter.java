@@ -45,6 +45,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * TODO: 异常处理器
  * Handles any <code>AccessDeniedException</code> and <code>AuthenticationException</code>
  * thrown within the filter chain.
  * <p>
@@ -118,6 +119,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		try {
+			// TODO: 直接往下执行, 出了异常进行catch, 下面就是授权相关的filter了
 			chain.doFilter(request, response);
 		}
 		catch (IOException ex) {
@@ -125,6 +127,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 		}
 		catch (Exception ex) {
 			// Try to extract a SpringSecurityException from the stacktrace
+			// TODO: 提取堆栈
 			Throwable[] causeChain = this.throwableAnalyzer.determineCauseChain(ex);
 			RuntimeException securityException = (AuthenticationException) this.throwableAnalyzer
 					.getFirstThrowableOfType(AuthenticationException.class, causeChain);
@@ -132,6 +135,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 				securityException = (AccessDeniedException) this.throwableAnalyzer
 						.getFirstThrowableOfType(AccessDeniedException.class, causeChain);
 			}
+			// TODO: 没有提取到授权相关的异常，直接抛出异常吧
 			if (securityException == null) {
 				rethrow(ex);
 			}
@@ -139,6 +143,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 				throw new ServletException("Unable to handle the Spring Security Exception "
 						+ "because the response is already committed.", ex);
 			}
+			// TODO: 处理授权过程中产生的异常
 			handleSpringSecurityException(request, response, chain, securityException);
 		}
 	}
@@ -164,11 +169,23 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 		return this.authenticationTrustResolver;
 	}
 
+	/**
+	 * TODO: 处理授权过程中产生的异常
+	 *
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @param exception
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	private void handleSpringSecurityException(HttpServletRequest request, HttpServletResponse response,
 			FilterChain chain, RuntimeException exception) throws IOException, ServletException {
+		// TODO: 专门针对这两种异常进行处理, 身份验证异常
 		if (exception instanceof AuthenticationException) {
 			handleAuthenticationException(request, response, chain, (AuthenticationException) exception);
 		}
+		// TODO: 访问被拒绝的异常
 		else if (exception instanceof AccessDeniedException) {
 			handleAccessDeniedException(request, response, chain, (AccessDeniedException) exception);
 		}
@@ -180,9 +197,21 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 		sendStartAuthentication(request, response, chain, exception);
 	}
 
+	/**
+	 * TODO: 访问被拒绝的异常
+	 *
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @param exception
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	private void handleAccessDeniedException(HttpServletRequest request, HttpServletResponse response,
 			FilterChain chain, AccessDeniedException exception) throws ServletException, IOException {
+		// TODO: 拿到当前认证用户的信息
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		// TODO: 看看是不是匿名用户，未登录用户
 		boolean isAnonymous = this.authenticationTrustResolver.isAnonymous(authentication);
 		if (isAnonymous || this.authenticationTrustResolver.isRememberMe(authentication)) {
 			if (logger.isTraceEnabled()) {
@@ -200,6 +229,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean implements Mes
 						LogMessage.format("Sending %s to access denied handler since access is denied", authentication),
 						exception);
 			}
+			// TODO: 利用handler进行处理
 			this.accessDeniedHandler.handle(request, response, exception);
 		}
 	}

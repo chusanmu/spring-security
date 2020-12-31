@@ -17,6 +17,8 @@
 package org.springframework.security.crypto.password;
 
 /**
+ * TODO: 密码编码
+ *
  * Service interface for encoding passwords.
  *
  * The preferred implementation is {@code BCryptPasswordEncoder}.
@@ -26,12 +28,14 @@ package org.springframework.security.crypto.password;
 public interface PasswordEncoder {
 
 	/**
+	 * TODO: 对密码进行编码
 	 * Encode the raw password. Generally, a good encoding algorithm applies a SHA-1 or
 	 * greater hash combined with an 8-byte or greater randomly generated salt.
 	 */
 	String encode(CharSequence rawPassword);
 
 	/**
+	 * TODO: 进行匹配密码是否正确
 	 * Verify the encoded password obtained from storage matches the submitted raw
 	 * password after it too is encoded. Returns true if the passwords match, false if
 	 * they do not. The stored password itself is never decoded.
@@ -43,6 +47,7 @@ public interface PasswordEncoder {
 	boolean matches(CharSequence rawPassword, String encodedPassword);
 
 	/**
+	 * TODO: 是否需要再次加密
 	 * Returns true if the encoded password should be encoded again for better security,
 	 * else false. The default implementation always returns false.
 	 * @param encodedPassword the encoded password to check

@@ -63,16 +63,28 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 		setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
 	}
 
+	/**
+	 * TODO: 密码校验
+	 *
+	 * @param userDetails as retrieved from the
+	 * {@link #retrieveUser(String, UsernamePasswordAuthenticationToken)} or
+	 * <code>UserCache</code>
+	 * @param authentication the current request that needs to be authenticated
+	 * @throws AuthenticationException
+	 */
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void additionalAuthenticationChecks(UserDetails userDetails,
 			UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+		// TODO: 如果密码为空，直接抛出个异常
 		if (authentication.getCredentials() == null) {
 			this.logger.debug("Failed to authenticate since no credentials provided");
 			throw new BadCredentialsException(this.messages
 					.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
 		}
+		// TODO: 密码比对，拿到你传的那个密码，然后和从userDetails中拿到的密码进行比对，看看是否匹配
 		String presentedPassword = authentication.getCredentials().toString();
+		// TODO: 如果密码不匹配，直接抛出个异常
 		if (!this.passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
 			this.logger.debug("Failed to authenticate since password does not match stored value");
 			throw new BadCredentialsException(this.messages
@@ -90,11 +102,13 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 			throws AuthenticationException {
 		prepareTimingAttackProtection();
 		try {
+			// TODO: 调用userDetailsService的loadUserByUsername方法获得UserDetails，如果为空，抛异常
 			UserDetails loadedUser = this.getUserDetailsService().loadUserByUsername(username);
 			if (loadedUser == null) {
 				throw new InternalAuthenticationServiceException(
 						"UserDetailsService returned null, which is an interface contract violation");
 			}
+			// TODO: 拿到了userDetails，直接返回了
 			return loadedUser;
 		}
 		catch (UsernameNotFoundException ex) {
@@ -114,6 +128,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 			UserDetails user) {
 		boolean upgradeEncoding = this.userDetailsPasswordService != null
 				&& this.passwordEncoder.upgradeEncoding(user.getPassword());
+		// TODO: 是否对密码进行二次加密
 		if (upgradeEncoding) {
 			String presentedPassword = authentication.getCredentials().toString();
 			String newPassword = this.passwordEncoder.encode(presentedPassword);

@@ -33,6 +33,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
+ * TODO: 生成退出页面, 第8个过滤器
+ *
  * Generates a default log out page.
  *
  * @author Rob Winch
@@ -40,6 +42,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class DefaultLogoutPageGeneratingFilter extends OncePerRequestFilter {
 
+	/**
+	 * TODO: 默认的退出路径，默认是GET方式
+	 */
 	private RequestMatcher matcher = new AntPathRequestMatcher("/logout", "GET");
 
 	private Function<HttpServletRequest, Map<String, String>> resolveHiddenInputs = (request) -> Collections.emptyMap();
@@ -47,7 +52,9 @@ public class DefaultLogoutPageGeneratingFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		// TODO: 判断请求是否 符合条件，如果符合，直接重定向至退出
 		if (this.matcher.matches(request)) {
+			// TODO: 生成退出页面
 			renderLogout(request, response);
 		}
 		else {
@@ -55,10 +62,18 @@ public class DefaultLogoutPageGeneratingFilter extends OncePerRequestFilter {
 				logger.trace(LogMessage.format("Did not render default logout page since request did not match [%s]",
 						this.matcher));
 			}
+			// TODO: 直接往下执行
 			filterChain.doFilter(request, response);
 		}
 	}
 
+	/**
+	 * TODO: 生成退出页面, 直接刷到客户端
+	 *
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
 	private void renderLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<!DOCTYPE html>\n");

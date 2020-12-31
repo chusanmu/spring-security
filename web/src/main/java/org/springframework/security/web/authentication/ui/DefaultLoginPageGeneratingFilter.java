@@ -40,6 +40,8 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.util.HtmlUtils;
 
 /**
+ * TODO: 默认的登录页面过滤器
+ *
  * For internal use with namespace configuration in the case where a user doesn't
  * configure a login page. The configuration code will insert this filter in the chain
  * instead.
@@ -51,6 +53,9 @@ import org.springframework.web.util.HtmlUtils;
  */
 public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 
+	/**
+	 * 默认的登录地址
+	 */
 	public static final String DEFAULT_LOGIN_PAGE_URL = "/login";
 
 	public static final String ERROR_PARAMETER_NAME = "error";
@@ -108,6 +113,7 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 
 	private void init(UsernamePasswordAuthenticationFilter authFilter,
 			AbstractAuthenticationProcessingFilter openIDFilter) {
+		// TODO: 默认的登录地址 /login
 		this.loginPageUrl = DEFAULT_LOGIN_PAGE_URL;
 		this.logoutSuccessUrl = DEFAULT_LOGIN_PAGE_URL + "?logout";
 		this.failureUrl = DEFAULT_LOGIN_PAGE_URL + "?" + ERROR_PARAMETER_NAME;
@@ -227,16 +233,28 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 			throws IOException, ServletException {
 		boolean loginError = isErrorPage(request);
 		boolean logoutSuccess = isLogoutSuccess(request);
+		// TODO: 判断是否是登录请求，或者登录错误，退出成功，然后直接返回至登录页面
 		if (isLoginUrlRequest(request) || loginError || logoutSuccess) {
 			String loginPageHtml = generateLoginPageHtml(request, loginError, logoutSuccess);
+			// TODO: 设置响应类型
 			response.setContentType("text/html;charset=UTF-8");
 			response.setContentLength(loginPageHtml.getBytes(StandardCharsets.UTF_8).length);
+			// TODO: 直接刷到客户端，然后就终止了，不再往下执行过滤器了
 			response.getWriter().write(loginPageHtml);
 			return;
 		}
+		// TODO: 接着往下执行下面的过滤器
 		chain.doFilter(request, response);
 	}
 
+	/**
+	 * TODO: 生成登录页面
+	 *
+	 * @param request
+	 * @param loginError
+	 * @param logoutSuccess
+	 * @return
+	 */
 	private String generateLoginPageHtml(HttpServletRequest request, boolean loginError, boolean logoutSuccess) {
 		String errorMsg = "Invalid credentials";
 		if (loginError) {

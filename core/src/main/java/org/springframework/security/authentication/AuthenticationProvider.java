@@ -42,6 +42,7 @@ public interface AuthenticationProvider {
 	Authentication authenticate(Authentication authentication) throws AuthenticationException;
 
 	/**
+	 * TODO: 是否支持认证处理此 authentication
 	 * Returns <code>true</code> if this <Code>AuthenticationProvider</code> supports the
 	 * indicated <Code>Authentication</code> object.
 	 * <p>

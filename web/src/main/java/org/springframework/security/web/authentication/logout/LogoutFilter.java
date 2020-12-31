@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * TODO: 第5个过滤器, 顾名思义，和注销退出有关
  * Logs a principal out.
  * <p>
  * Polls a series of {@link LogoutHandler}s. The handlers should be specified in the order
@@ -68,6 +69,7 @@ public class LogoutFilter extends GenericFilterBean {
 		this.handler = new CompositeLogoutHandler(handlers);
 		Assert.notNull(logoutSuccessHandler, "logoutSuccessHandler cannot be null");
 		this.logoutSuccessHandler = logoutSuccessHandler;
+		// TODO: 设置退出路径
 		setFilterProcessesUrl("/logout");
 	}
 
@@ -91,12 +93,16 @@ public class LogoutFilter extends GenericFilterBean {
 
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: 看看你是否需要退出, 判断路径是否是logout
 		if (requiresLogout(request, response)) {
+			// TODO: 把认证信息拿过来
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug(LogMessage.format("Logging out [%s]", auth));
 			}
+			// TODO: 开始处理退出，清除session 以及 清除security context holder
 			this.handler.logout(request, response, auth);
+			// TODO: 处理回调，退出成功回调
 			this.logoutSuccessHandler.onLogoutSuccess(request, response, auth);
 			return;
 		}
@@ -110,12 +116,14 @@ public class LogoutFilter extends GenericFilterBean {
 	 * @return <code>true</code> if logout should occur, <code>false</code> otherwise
 	 */
 	protected boolean requiresLogout(HttpServletRequest request, HttpServletResponse response) {
+		// TODO: 判断uri是否匹配，如果匹配退出，那就返回true
 		if (this.logoutRequestMatcher.matches(request)) {
 			return true;
 		}
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace(LogMessage.format("Did not match request to %s", this.logoutRequestMatcher));
 		}
+		// TODO: 直接返回false，不匹配
 		return false;
 	}
 
@@ -124,6 +132,11 @@ public class LogoutFilter extends GenericFilterBean {
 		this.logoutRequestMatcher = logoutRequestMatcher;
 	}
 
+	/**
+	 * 设置退出路径
+	 *
+	 * @param filterProcessesUrl
+	 */
 	public void setFilterProcessesUrl(String filterProcessesUrl) {
 		this.logoutRequestMatcher = new AntPathRequestMatcher(filterProcessesUrl);
 	}

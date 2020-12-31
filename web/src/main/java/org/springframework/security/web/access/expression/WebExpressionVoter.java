@@ -31,6 +31,7 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 使用 spel 进行决策投票
  * Voter which handles web authorisation decisions.
  *
  * @author Luke Taylor
@@ -41,6 +42,7 @@ public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation>
 	private final Log logger = LogFactory.getLog(getClass());
 
 	private SecurityExpressionHandler<FilterInvocation> expressionHandler = new DefaultWebSecurityExpressionHandler();
+
 
 	@Override
 	public int vote(Authentication authentication, FilterInvocation filterInvocation,

@@ -68,6 +68,7 @@ public class HeaderWriterFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		// TODO: 默认是false的
 		if (this.shouldWriteHeadersEagerly) {
 			doHeadersBefore(request, response, filterChain);
 		}
@@ -82,14 +83,24 @@ public class HeaderWriterFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
+	/**
+	 * TODO: 在执行完一系列的过滤器后，会在响应头上 设置一系列的响应头
+	 * @param request
+	 * @param response
+	 * @param filterChain
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	private void doHeadersAfter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws IOException, ServletException {
 		HeaderWriterResponse headerWriterResponse = new HeaderWriterResponse(request, response);
 		HeaderWriterRequest headerWriterRequest = new HeaderWriterRequest(request, headerWriterResponse);
 		try {
+			// TODO: 执行过滤器链
 			filterChain.doFilter(headerWriterRequest, headerWriterResponse);
 		}
 		finally {
+			// TODO: 写响应头
 			headerWriterResponse.writeHeaders();
 		}
 	}

@@ -47,6 +47,8 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * TODO: 过滤器链代理，所有的filter加入其中，形成了一条链，然后依次执行
+ *
  * Delegates {@code Filter} requests to a list of Spring-managed filter beans. As of
  * version 2.0, you shouldn't need to explicitly configure a {@code FilterChainProxy} bean
  * in your application context unless you need very fine control over the filter chain
@@ -170,6 +172,15 @@ public class FilterChainProxy extends GenericFilterBean {
 		this.filterChainValidator.validate(this);
 	}
 
+	/**
+	 * TODO: doFilter，进行调用
+	 * 会执行其doFilterInternal方法
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
@@ -191,6 +202,15 @@ public class FilterChainProxy extends GenericFilterBean {
 		}
 	}
 
+	/**
+	 * TODO: 请求必经之地，请求request过来之后，会在 VirtualFilterChain 中进行流转
+	 *
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	private void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		FirewalledRequest firewallRequest = this.firewall.getFirewalledRequest((HttpServletRequest) request);
@@ -207,7 +227,9 @@ public class FilterChainProxy extends GenericFilterBean {
 		if (logger.isDebugEnabled()) {
 			logger.debug(LogMessage.of(() -> "Securing " + requestLine(firewallRequest)));
 		}
+		// TODO: 一个虚拟的过滤器链，将所有的filters以及chain交给它
 		VirtualFilterChain virtualFilterChain = new VirtualFilterChain(firewallRequest, chain, filters);
+		// TODO: 执行它的doFilter方法
 		virtualFilterChain.doFilter(firewallRequest, firewallResponse);
 	}
 
@@ -311,28 +333,43 @@ public class FilterChainProxy extends GenericFilterBean {
 		private VirtualFilterChain(FirewalledRequest firewalledRequest, FilterChain chain,
 				List<Filter> additionalFilters) {
 			this.originalChain = chain;
+			// TODO: 将所有的filters全部放进 additionalFilters 中
 			this.additionalFilters = additionalFilters;
 			this.size = additionalFilters.size();
 			this.firewalledRequest = firewalledRequest;
 		}
 
+		/**
+		 * TODO: 责任链模式
+		 *  所有的filter都将在此按顺序依次执行
+		 *
+		 * @param request
+		 * @param response
+		 * @throws IOException
+		 * @throws ServletException
+		 */
 		@Override
 		public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+			// TODO: 如果当前执行的filter走到了最后
 			if (this.currentPosition == this.size) {
 				if (logger.isDebugEnabled()) {
 					logger.debug(LogMessage.of(() -> "Secured " + requestLine(this.firewalledRequest)));
 				}
 				// Deactivate path stripping as we exit the security filter chain
 				this.firewalledRequest.reset();
+				// TODO: 继续执行它原始的filterChain，ApplicationFilterChain
 				this.originalChain.doFilter(request, response);
 				return;
 			}
+			// TODO: 位置加1，默认是0，0+1 之后又减去了1，所以拿到的还是0
 			this.currentPosition++;
+			// TODO: 将下一个需要执行filter拿到
 			Filter nextFilter = this.additionalFilters.get(this.currentPosition - 1);
 			if (logger.isTraceEnabled()) {
 				logger.trace(LogMessage.format("Invoking %s (%d/%d)", nextFilter.getClass().getSimpleName(),
 						this.currentPosition, this.size));
 			}
+			// TODO: 执行下一个filter的doFilter方法
 			nextFilter.doFilter(request, response, this);
 		}
 

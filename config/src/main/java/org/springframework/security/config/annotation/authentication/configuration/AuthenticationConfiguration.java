@@ -75,10 +75,19 @@ public class AuthenticationConfiguration {
 
 	private ObjectPostProcessor<Object> objectPostProcessor;
 
+	/**
+	 * TODO:  加入身份验证管理器builder
+	 *
+	 * @param objectPostProcessor
+	 * @param context
+	 * @return
+	 */
 	@Bean
 	public AuthenticationManagerBuilder authenticationManagerBuilder(ObjectPostProcessor<Object> objectPostProcessor,
 			ApplicationContext context) {
+		// TODO: 加入了一个延迟初始化的 passwordEncoder，只有真正用到 matches 的时候，才从容器中拿出来这个passwordEncoder，如果没有此bean，则创建一个
 		LazyPasswordEncoder defaultPasswordEncoder = new LazyPasswordEncoder(context);
+		// TODO: 从容器中尝试拿出来 AuthenticationEventPublisher
 		AuthenticationEventPublisher authenticationEventPublisher = getBeanOrNull(context,
 				AuthenticationEventPublisher.class);
 		DefaultPasswordEncoderAuthenticationManagerBuilder result = new DefaultPasswordEncoderAuthenticationManagerBuilder(
@@ -95,6 +104,12 @@ public class AuthenticationConfiguration {
 		return new EnableGlobalAuthenticationAutowiredConfigurer(context);
 	}
 
+	/**
+	 * TODO: 会添加配置UserDetailsService以及PasswordEncoder等组件
+	 *
+	 * @param context
+	 * @return
+	 */
 	@Bean
 	public static InitializeUserDetailsBeanManagerConfigurer initializeUserDetailsBeanManagerConfigurer(
 			ApplicationContext context) {
@@ -210,6 +225,7 @@ public class AuthenticationConfiguration {
 
 		@Override
 		public void init(AuthenticationManagerBuilder auth) {
+			// TODO: 将EnableGlobalAuthentication标注的bean加载初始化
 			Map<String, Object> beansWithAnnotation = this.context
 					.getBeansWithAnnotation(EnableGlobalAuthentication.class);
 			if (logger.isTraceEnabled()) {
@@ -308,6 +324,13 @@ public class AuthenticationConfiguration {
 			return getPasswordEncoder().encode(rawPassword);
 		}
 
+		/**
+		 * TODO: 需要matches密码是否匹配，这时候才去拿容器里的passwordEncoder
+		 *
+		 * @param rawPassword the raw password to encode and match
+		 * @param encodedPassword the encoded password from storage to compare with
+		 * @return
+		 */
 		@Override
 		public boolean matches(CharSequence rawPassword, String encodedPassword) {
 			return getPasswordEncoder().matches(rawPassword, encodedPassword);
@@ -319,13 +342,17 @@ public class AuthenticationConfiguration {
 		}
 
 		private PasswordEncoder getPasswordEncoder() {
+			// TODO: 如果passwordEncoder不为空，则直接返回
 			if (this.passwordEncoder != null) {
 				return this.passwordEncoder;
 			}
+			// TODO: 否则从容器中把bean去处理，如果没有，拿出来个null
 			PasswordEncoder passwordEncoder = getBeanOrNull(this.applicationContext, PasswordEncoder.class);
 			if (passwordEncoder == null) {
+				// TODO: 如果为空，进行创建
 				passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 			}
+			// TODO: 赋值，返回passwordEncoder
 			this.passwordEncoder = passwordEncoder;
 			return passwordEncoder;
 		}

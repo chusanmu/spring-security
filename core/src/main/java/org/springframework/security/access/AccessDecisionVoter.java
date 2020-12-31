@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.springframework.security.core.Authentication;
 
 /**
+ * TODO: 对授权决策进行投票
  * Indicates a class is responsible for voting on authorization decisions.
  * <p>
  * The coordination of voting (ie polling {@code AccessDecisionVoter}s, tallying their
@@ -31,13 +32,24 @@ import org.springframework.security.core.Authentication;
  */
 public interface AccessDecisionVoter<S> {
 
+	/**
+	 * TODO: 授予访问权限，权限通过
+	 */
 	int ACCESS_GRANTED = 1;
 
+	/**
+	 *  TODO: 弃权
+	 */
 	int ACCESS_ABSTAIN = 0;
 
+	/**
+	 * TODO: 拒绝访问
+	 */
 	int ACCESS_DENIED = -1;
 
 	/**
+	 * TODO: 是否支持处理这个configAttribute
+	 *
 	 * Indicates whether this {@code AccessDecisionVoter} is able to vote on the passed
 	 * {@code ConfigAttribute}.
 	 * <p>
@@ -52,6 +64,7 @@ public interface AccessDecisionVoter<S> {
 	boolean supports(ConfigAttribute attribute);
 
 	/**
+	 * TODO: 是否支持处理这个class类型
 	 * Indicates whether the {@code AccessDecisionVoter} implementation is able to provide
 	 * access control votes for the indicated secured object type.
 	 * @param clazz the class that is being queried
@@ -60,6 +73,8 @@ public interface AccessDecisionVoter<S> {
 	boolean supports(Class<?> clazz);
 
 	/**
+	 * TODO: 进行投票
+	 *
 	 * Indicates whether or not access is granted.
 	 * <p>
 	 * The decision must be affirmative ({@code ACCESS_GRANTED}), negative (

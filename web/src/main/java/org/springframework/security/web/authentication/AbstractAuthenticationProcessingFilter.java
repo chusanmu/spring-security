@@ -214,11 +214,13 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: 判断是否需要去认证，如果不需要认证，直接放行
 		if (!requiresAuthentication(request, response)) {
 			chain.doFilter(request, response);
 			return;
 		}
 		try {
+			// TODO: 尝试去认证
 			Authentication authenticationResult = attemptAuthentication(request, response);
 			if (authenticationResult == null) {
 				// return immediately as subclass has indicated that it hasn't completed

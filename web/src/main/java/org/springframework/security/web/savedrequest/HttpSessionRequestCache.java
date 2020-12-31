@@ -97,11 +97,13 @@ public class HttpSessionRequestCache implements RequestCache {
 
 	@Override
 	public HttpServletRequest getMatchingRequest(HttpServletRequest request, HttpServletResponse response) {
+		// TODO: 没有保存的请求，直接返回
 		SavedRequest saved = getRequest(request, response);
 		if (saved == null) {
 			this.logger.trace("No saved request");
 			return null;
 		}
+		// TODO: 没匹配到，直接返回
 		if (!matchesSavedRequest(request, saved)) {
 			if (this.logger.isTraceEnabled()) {
 				this.logger.trace(LogMessage.format("Did not match request %s to the saved one %s",

@@ -25,6 +25,8 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * TODO: 一票通过
+ *
  * Simple concrete implementation of
  * {@link org.springframework.security.access.AccessDecisionManager} that grants access if
  * any <code>AccessDecisionVoter</code> returns an affirmative response.
@@ -56,9 +58,12 @@ public class AffirmativeBased extends AbstractAccessDecisionManager {
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
 			throws AccessDeniedException {
 		int deny = 0;
+		// TODO: 遍历所有的访问投票器
 		for (AccessDecisionVoter voter : getDecisionVoters()) {
+			// TODO: 进行投票，如果有一个拒绝了，deny++ 然后就大于0了 直接就抛出异常，默认的投票器 WebExpressionVoter
 			int result = voter.vote(authentication, object, configAttributes);
 			switch (result) {
+				// TODO: 如果有一票通过了，那么也就直接return返回了
 			case AccessDecisionVoter.ACCESS_GRANTED:
 				return;
 			case AccessDecisionVoter.ACCESS_DENIED:

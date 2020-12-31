@@ -68,11 +68,15 @@ public class SecurityContextHolder {
 	}
 
 	private static void initialize() {
+		// TODO: 尝试从系统属性中加载spring.security.strategy" 如果有的话，设置相应的类型
 		if (!StringUtils.hasText(strategyName)) {
 			// Set default
+			// TODO: 如果不存在，就设置模式为threadLocal
 			strategyName = MODE_THREADLOCAL;
 		}
+		// TODO: 创建不同的SecurityContextHolder
 		if (strategyName.equals(MODE_THREADLOCAL)) {
+			// TODO: 使用threadLocal去存储
 			strategy = new ThreadLocalSecurityContextHolderStrategy();
 		}
 		else if (strategyName.equals(MODE_INHERITABLETHREADLOCAL)) {
@@ -83,6 +87,7 @@ public class SecurityContextHolder {
 		}
 		else {
 			// Try to load a custom strategy
+			// TODO: 最后都不是的话，会尝试去加载你设置的holderStrategy
 			try {
 				Class<?> clazz = Class.forName(strategyName);
 				Constructor<?> customStrategy = clazz.getConstructor();
@@ -92,6 +97,7 @@ public class SecurityContextHolder {
 				ReflectionUtils.handleReflectionException(ex);
 			}
 		}
+		// TODO: 初始化此时+1
 		initializeCount++;
 	}
 
@@ -121,6 +127,7 @@ public class SecurityContextHolder {
 	}
 
 	/**
+	 * TODO: 存储securityContext, 默认的存储模式是ThreadLocal
 	 * Associates a new <code>SecurityContext</code> with the current thread of execution.
 	 * @param context the new <code>SecurityContext</code> (may not be <code>null</code>)
 	 */

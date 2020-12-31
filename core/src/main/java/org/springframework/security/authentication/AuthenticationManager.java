@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
+ * TODO: 认证管理器，负责去认证
+ *
  * Processes an {@link Authentication} request.
  *
  * @author Ben Alex

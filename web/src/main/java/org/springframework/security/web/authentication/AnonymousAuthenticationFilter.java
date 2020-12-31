@@ -37,6 +37,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * TODO: 匿名身份验证过滤器
+ *
  * Detects if there is no {@code Authentication} object in the
  * {@code SecurityContextHolder}, and populates it with one if needed.
  *
@@ -86,6 +88,7 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: SecurityContextHolder中 authentication为空，说明是个匿名用户, 创建个匿名的用户信息，存放进去
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			SecurityContextHolder.getContext().setAuthentication(createAuthentication((HttpServletRequest) req));
 			if (this.logger.isTraceEnabled()) {
@@ -102,10 +105,12 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements 
 						+ SecurityContextHolder.getContext().getAuthentication()));
 			}
 		}
+		// TODO: 接着往下走了
 		chain.doFilter(req, res);
 	}
 
 	protected Authentication createAuthentication(HttpServletRequest request) {
+		// TODO: 创建一个 AnonymousAuthenticationToken
 		AnonymousAuthenticationToken token = new AnonymousAuthenticationToken(this.key, this.principal,
 				this.authorities);
 		token.setDetails(this.authenticationDetailsSource.buildDetails(request));

@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContext;
 
 /**
+ * TODO: 持久化 SecurityContext的策略
+ *
  * Strategy used for persisting a {@link SecurityContext} between requests.
  * <p>
  * Used by {@link SecurityContextPersistenceFilter} to obtain the context which should be
@@ -40,6 +42,8 @@ import org.springframework.security.core.context.SecurityContext;
 public interface SecurityContextRepository {
 
 	/**
+	 * TODO: 从request中获取SecurityContext，对于未认证的用户，此方法不应该返回null, 应该返回一个空的
+	 * TODO: Context的实现
 	 * Obtains the security context for the supplied request. For an unauthenticated user,
 	 * an empty context implementation should be returned. This method should not return
 	 * null.
@@ -59,6 +63,7 @@ public interface SecurityContextRepository {
 	SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder);
 
 	/**
+	 * TODO: 保存安全上下文
 	 * Stores the security context on completion of a request.
 	 * @param context the non-null context which was obtained from the holder.
 	 * @param request
@@ -67,6 +72,7 @@ public interface SecurityContextRepository {
 	void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response);
 
 	/**
+	 * TODO: 判断是否包含安全上下文
 	 * Allows the repository to be queried as to whether it contains a security context
 	 * for the current request.
 	 * @param request the current request

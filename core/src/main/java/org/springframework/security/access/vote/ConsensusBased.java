@@ -25,6 +25,7 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * TODO: 少数服从多数
  * Simple concrete implementation of
  * {@link org.springframework.security.access.AccessDecisionManager} that uses a
  * consensus-based approach.
@@ -64,9 +65,12 @@ public class ConsensusBased extends AbstractAccessDecisionManager {
 			throws AccessDeniedException {
 		int grant = 0;
 		int deny = 0;
+		// TODO: 获取所有的投票器
 		for (AccessDecisionVoter voter : getDecisionVoters()) {
+			// TODO: 进行投票
 			int result = voter.vote(authentication, object, configAttributes);
 			switch (result) {
+				// TODO: 进行计票，最后会进行比较
 			case AccessDecisionVoter.ACCESS_GRANTED:
 				grant++;
 				break;
@@ -77,9 +81,11 @@ public class ConsensusBased extends AbstractAccessDecisionManager {
 				break;
 			}
 		}
+		// TODO: 同意的票数多，那就直接返回掉
 		if (grant > deny) {
 			return;
 		}
+		// TODO: 否则 抛出异常
 		if (deny > grant) {
 			throw new AccessDeniedException(
 					this.messages.getMessage("AbstractAccessDecisionManager.accessDenied", "Access is denied"));

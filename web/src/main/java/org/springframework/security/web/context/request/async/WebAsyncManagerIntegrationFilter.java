@@ -30,6 +30,7 @@ import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
+ * TODO: spring security 默认的第一个过滤器
  * Provides integration between the {@link SecurityContext} and Spring Web's
  * {@link WebAsyncManager} by using the
  * {@link SecurityContextCallableProcessingInterceptor#beforeConcurrentHandling(org.springframework.web.context.request.NativeWebRequest, Callable)}
@@ -45,13 +46,20 @@ public final class WebAsyncManagerIntegrationFilter extends OncePerRequestFilter
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		// TODO: 从请求属性上获取所绑定的webAsyncManager, 如果尚未绑定，先做绑定
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		// TODO: 从asyncManager中获取key为 CALLABLE_INTERCEPTOR_KEY 的SecurityContextCallableProcessingInterceptor，如果获取到的为Null
+		// TODO: 说明其中还没有key为 CALLABLE_INTERCEPTOR_KEY 的SecurityContextCallableProcessingInterceptor,新建一个，并使用该key注册上去
 		SecurityContextCallableProcessingInterceptor securityProcessingInterceptor = (SecurityContextCallableProcessingInterceptor) asyncManager
 				.getCallableInterceptor(CALLABLE_INTERCEPTOR_KEY);
+		// TODO: SecurityContextCallableProcessingInterceptor实现了 接口 CallableProcessingInterceptor，当它被应用于一次异步执行时
+		// TODO: 它的方法beforeConcurrentHanding会在调用者线程执行，该方法会相应的从当前线程获取securityCOntext,然后被调用者线程执行设计的逻辑
+		// TODO: 会使这个SecurityContext，从而实现上下文从调用者线程到被调用者线程的传播
 		if (securityProcessingInterceptor == null) {
 			asyncManager.registerCallableInterceptor(CALLABLE_INTERCEPTOR_KEY,
 					new SecurityContextCallableProcessingInterceptor());
 		}
+		// TODO: 去执行下一个过滤器
 		filterChain.doFilter(request, response);
 	}
 

@@ -183,7 +183,9 @@ public abstract class AbstractSecurityInterceptor
 					+ " but AbstractSecurityInterceptor only configured to support secure objects of type: "
 					+ getSecureObjectClass());
 		}
+		// TODO: 获取授权相关的metadataSource，相关的元信息啊
 		Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource().getAttributes(object);
+		// TODO: 如果为空，直接返回了，没法进行权限校验了
 		if (CollectionUtils.isEmpty(attributes)) {
 			Assert.isTrue(!this.rejectPublicInvocations,
 					() -> "Secure object invocation " + object
@@ -196,19 +198,23 @@ public abstract class AbstractSecurityInterceptor
 			publishEvent(new PublicInvocationEvent(object));
 			return null; // no further work post-invocation
 		}
+		// TODO: 认证信息为空，也没法校验
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			credentialsNotFound(this.messages.getMessage("AbstractSecurityInterceptor.authenticationNotFound",
 					"An Authentication object was not found in the SecurityContext"), object, attributes);
 		}
+		// TODO: 判断是否需要进行认证
 		Authentication authenticated = authenticateIfRequired();
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace(LogMessage.format("Authorizing %s with attributes %s", object, attributes));
 		}
 		// Attempt authorization
+		// TODO: 尝试去授权
 		attemptAuthorization(object, attributes, authenticated);
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug(LogMessage.format("Authorized %s with attributes %s", object, attributes));
 		}
+		// TODO: 授权成功，发布授权成功事件
 		if (this.publishAuthorizationSuccess) {
 			publishEvent(new AuthorizedEvent(object, attributes, authenticated));
 		}
@@ -228,6 +234,7 @@ public abstract class AbstractSecurityInterceptor
 		}
 		this.logger.trace("Did not switch RunAs authentication since RunAsManager returned null");
 		// no further work post-invocation
+		// TODO: 返回结果
 		return new InterceptorStatusToken(SecurityContextHolder.getContext(), false, attributes, object);
 
 	}
@@ -235,6 +242,7 @@ public abstract class AbstractSecurityInterceptor
 	private void attemptAuthorization(Object object, Collection<ConfigAttribute> attributes,
 			Authentication authenticated) {
 		try {
+			// TODO: 利用访问决策管理器，去进行授权
 			this.accessDecisionManager.decide(authenticated, object, attributes);
 		}
 		catch (AccessDeniedException ex) {
@@ -245,6 +253,7 @@ public abstract class AbstractSecurityInterceptor
 			else if (this.logger.isDebugEnabled()) {
 				this.logger.debug(LogMessage.format("Failed to authorize %s with attributes %s", object, attributes));
 			}
+			// TODO: 发布授权失败事件
 			publishEvent(new AuthorizationFailureEvent(object, attributes, authenticated, ex));
 			throw ex;
 		}
@@ -304,18 +313,22 @@ public abstract class AbstractSecurityInterceptor
 	 * @return an authenticated <tt>Authentication</tt> object.
 	 */
 	private Authentication authenticateIfRequired() {
+		// TODO: 从context holder中取出 Authentication 认证信息
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		// TODO: 如果已经认证过了，就直接返回吧
 		if (authentication.isAuthenticated() && !this.alwaysReauthenticate) {
 			if (this.logger.isTraceEnabled()) {
 				this.logger.trace(LogMessage.format("Did not re-authenticate %s before authorizing", authentication));
 			}
 			return authentication;
 		}
+		// TODO: 否则进行认证
 		authentication = this.authenticationManager.authenticate(authentication);
 		// Don't authenticated.setAuthentication(true) because each provider does that
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug(LogMessage.format("Re-authenticated %s before authorizing", authentication));
 		}
+		// TODO: 将认证信息存到SecurityContextHolder中
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		return authentication;
 	}

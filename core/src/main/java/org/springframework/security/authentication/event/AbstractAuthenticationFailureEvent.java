@@ -21,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 认证失败事件, 构造器有两个入参
  * Abstract application event which indicates authentication failure for some reason.
  *
  * @author Ben Alex

@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * TODO: 负责去认证请求
+ *
  * Iterates an {@link Authentication} request through a list of
  * {@link AuthenticationProvider}s.
  *
@@ -93,10 +95,16 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 
 	private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
 
+	/**
+	 * TODO: 维护了一个集合专门去处理认知
+	 */
 	private List<AuthenticationProvider> providers = Collections.emptyList();
 
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
+	/**
+	 * TODO: 这里采用了组合的方式，将 AuthenticationManager 组合进来了
+	 */
 	private AuthenticationManager parent;
 
 	private boolean eraseCredentialsAfterAuthentication = true;
@@ -129,6 +137,9 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		checkState();
 	}
 
+	/**
+	 * TODO: 检查这个bean当前状态是否合法，如果parent和providers都为空,那就没法进行认证了，直接报错得了
+	 */
 	@Override
 	public void afterPropertiesSet() {
 		checkState();
@@ -163,6 +174,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		// TODO: 表达提交的话，默认使用的是 UsernamePasswordAuthenticationToken 这个token
 		Class<? extends Authentication> toTest = authentication.getClass();
 		AuthenticationException lastException = null;
 		AuthenticationException parentException = null;
@@ -170,7 +182,9 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		Authentication parentResult = null;
 		int currentPosition = 0;
 		int size = this.providers.size();
+		// TODO: 尝试使用 AuthenticationProvider 去认证用户
 		for (AuthenticationProvider provider : getProviders()) {
+			// TODO: 如果这个 provider不支持处理 这个 Authentication， 直接下一位去处理
 			if (!provider.supports(toTest)) {
 				continue;
 			}
@@ -179,7 +193,9 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 						provider.getClass().getSimpleName(), ++currentPosition, size));
 			}
 			try {
+				// TODO: 使用当前provider去做认证
 				result = provider.authenticate(authentication);
+				// TODO: 如果result不为空，直接break掉
 				if (result != null) {
 					copyDetails(authentication, result);
 					break;
@@ -195,9 +211,11 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 				lastException = ex;
 			}
 		}
+		// TODO: 如果没有一个 providers 能处理的了
 		if (result == null && this.parent != null) {
 			// Allow the parent to try.
 			try {
+				// TODO: 如果parent不为空，再尝试使用parent去认证
 				parentResult = this.parent.authenticate(authentication);
 				result = parentResult;
 			}
@@ -212,6 +230,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 				lastException = ex;
 			}
 		}
+		// TODO: 认证成功了
 		if (result != null) {
 			if (this.eraseCredentialsAfterAuthentication && (result instanceof CredentialsContainer)) {
 				// Authentication is complete. Remove credentials and other secret data
@@ -222,10 +241,13 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 			// will publish an AuthenticationSuccessEvent
 			// This check prevents a duplicate AuthenticationSuccessEvent if the parent
 			// AuthenticationManager already published it
+			// TODO: 发布认证成功事件
 			if (parentResult == null) {
+				// TODO: 发布认证成功事件
 				this.eventPublisher.publishAuthenticationSuccess(result);
 			}
 
+			// TODO: 返回认证结果
 			return result;
 		}
 

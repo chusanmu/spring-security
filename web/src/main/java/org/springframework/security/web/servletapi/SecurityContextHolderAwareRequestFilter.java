@@ -146,6 +146,7 @@ public class SecurityContextHolderAwareRequestFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: 直接就往下执行了 封装了请求 Servlet3SecurityContextHolderAwareRequestWrapper
 		chain.doFilter(this.requestFactory.create((HttpServletRequest) req, (HttpServletResponse) res), res);
 	}
 

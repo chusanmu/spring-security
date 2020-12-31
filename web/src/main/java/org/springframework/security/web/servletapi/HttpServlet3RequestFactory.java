@@ -158,6 +158,13 @@ final class HttpServlet3RequestFactory implements HttpServletRequestFactory {
 		this.trustResolver = trustResolver;
 	}
 
+	/**
+	 * TODO: 包装了request
+	 *
+	 * @param request the original {@link HttpServletRequest}. Cannot be null.
+	 * @param response the original {@link HttpServletResponse}. Cannot be null.
+	 * @return
+	 */
 	@Override
 	public HttpServletRequest create(HttpServletRequest request, HttpServletResponse response) {
 		return new Servlet3SecurityContextHolderAwareRequestWrapper(request, this.rolePrefix, response);
@@ -211,6 +218,12 @@ final class HttpServlet3RequestFactory implements HttpServletRequestFactory {
 			return false;
 		}
 
+		/**
+		 * TODO: servlet 3.0的方法
+		 * @param username
+		 * @param password
+		 * @throws ServletException
+		 */
 		@Override
 		public void login(String username, String password) throws ServletException {
 			if (isAuthenticated()) {
@@ -224,6 +237,7 @@ final class HttpServlet3RequestFactory implements HttpServletRequestFactory {
 				super.login(username, password);
 				return;
 			}
+			// TODO: 将认证信息，存放至 SecurityContextHolder中
 			Authentication authentication = getAuthentication(authManager, username, password);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}

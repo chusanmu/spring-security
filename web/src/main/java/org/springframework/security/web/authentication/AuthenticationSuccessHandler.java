@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
 /**
+ * TODO: 用于处理认证成功回调
+ *
  * Strategy used to handle a successful user authentication.
  * <p>
  * Implementations can do whatever they want but typical behaviour would be to control the

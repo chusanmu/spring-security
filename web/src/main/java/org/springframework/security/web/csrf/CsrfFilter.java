@@ -41,6 +41,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
+ * TODO: 第4个过滤器，和csrf有关
  * <p>
  * Applies
  * <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)" >CSRF</a>
@@ -101,9 +102,11 @@ public final class CsrfFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		request.setAttribute(HttpServletResponse.class.getName(), response);
+		// TODO: 获取csrf token
 		CsrfToken csrfToken = this.tokenRepository.loadToken(request);
 		boolean missingToken = (csrfToken == null);
 		if (missingToken) {
+			// TODO: 如果不存在toke，则生成token 并存起来
 			csrfToken = this.tokenRepository.generateToken(request);
 			this.tokenRepository.saveToken(csrfToken, request, response);
 		}
@@ -129,6 +132,7 @@ public final class CsrfFilter extends OncePerRequestFilter {
 			this.accessDeniedHandler.handle(request, response, exception);
 			return;
 		}
+		// TODO: 继续执行过滤器
 		filterChain.doFilter(request, response);
 	}
 

@@ -30,6 +30,8 @@ import org.springframework.core.log.LogMessage;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
+ * TODO: 默认的security filter chain
+ *
  * Standard implementation of {@code SecurityFilterChain}.
  *
  * @author Luke Taylor
@@ -41,6 +43,9 @@ public final class DefaultSecurityFilterChain implements SecurityFilterChain {
 
 	private final RequestMatcher requestMatcher;
 
+	/**
+	 * TODO: 所有的filters
+	 */
 	private final List<Filter> filters;
 
 	public DefaultSecurityFilterChain(RequestMatcher requestMatcher, Filter... filters) {

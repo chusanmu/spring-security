@@ -42,6 +42,9 @@ import org.springframework.web.context.request.async.CallableProcessingIntercept
  */
 public final class SecurityContextCallableProcessingInterceptor extends CallableProcessingInterceptorAdapter {
 
+	/**
+	 * TODO: 用来维护安全上下文
+	 */
 	private volatile SecurityContext securityContext;
 
 	/**

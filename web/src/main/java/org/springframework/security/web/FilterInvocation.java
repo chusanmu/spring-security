@@ -62,6 +62,8 @@ public class FilterInvocation {
 
 	private FilterChain chain;
 
+	/* ---------------- 封装了 httpServletRequest 以及 httpServletResponse -------------- */
+
 	private HttpServletRequest request;
 
 	private HttpServletResponse response;

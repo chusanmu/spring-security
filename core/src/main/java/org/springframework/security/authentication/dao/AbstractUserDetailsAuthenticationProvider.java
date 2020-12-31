@@ -44,6 +44,7 @@ import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 用户信息认证
  * A base {@link AuthenticationProvider} that allows subclasses to override and work with
  * {@link org.springframework.security.core.userdetails.UserDetails} objects. The class is
  * designed to respond to {@link UsernamePasswordAuthenticationToken} authentication
@@ -119,17 +120,27 @@ public abstract class AbstractUserDetailsAuthenticationProvider
 		doAfterPropertiesSet();
 	}
 
+	/**
+	 * TODO: 进行认证
+	 * @param authentication the authentication request object.
+	 * @return
+	 * @throws AuthenticationException
+	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
 				() -> this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.onlySupports",
 						"Only UsernamePasswordAuthenticationToken is supported"));
+		// TODO: 获取username
 		String username = determineUsername(authentication);
 		boolean cacheWasUsed = true;
+		// TODO: 尝试从缓存中获取userDetails
 		UserDetails user = this.userCache.getUserFromCache(username);
+		// TODO: 如果user为空，这时候需要去进行加载了，可能是数据库，也可能是其他地方
 		if (user == null) {
 			cacheWasUsed = false;
 			try {
+				// TODO: 尝试去获取用户
 				user = retrieveUser(username, (UsernamePasswordAuthenticationToken) authentication);
 			}
 			catch (UsernameNotFoundException ex) {
@@ -143,21 +154,26 @@ public abstract class AbstractUserDetailsAuthenticationProvider
 			Assert.notNull(user, "retrieveUser returned null - a violation of the interface contract");
 		}
 		try {
+			// TODO: 检查一下这个user账号是否异常
 			this.preAuthenticationChecks.check(user);
+			// TODO: 这时候去检查密码是否正确了
 			additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken) authentication);
 		}
 		catch (AuthenticationException ex) {
+			// TODO: 如果是内存中拿出来的user, 那再来查一次进行校验一下，否则不是内存拿来的，那就直接抛出吧
 			if (!cacheWasUsed) {
 				throw ex;
 			}
 			// There was a problem, so try again after checking
 			// we're using latest data (i.e. not from the cache)
+			// TODO: 可能是数据变了，再来查一次，进行比对密码
 			cacheWasUsed = false;
 			user = retrieveUser(username, (UsernamePasswordAuthenticationToken) authentication);
 			this.preAuthenticationChecks.check(user);
 			additionalAuthenticationChecks(user, (UsernamePasswordAuthenticationToken) authentication);
 		}
 		this.postAuthenticationChecks.check(user);
+		// TODO: 判断是否需要放到缓存中
 		if (!cacheWasUsed) {
 			this.userCache.putUserInCache(user);
 		}
@@ -165,6 +181,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider
 		if (this.forcePrincipalAsString) {
 			principalToReturn = user.getUsername();
 		}
+		// TODO: 创建成功的认证
 		return createSuccessAuthentication(principalToReturn, authentication, user);
 	}
 
@@ -316,20 +333,28 @@ public abstract class AbstractUserDetailsAuthenticationProvider
 
 	private class DefaultPreAuthenticationChecks implements UserDetailsChecker {
 
+		/**
+		 * TODO: 检查user是否正常
+		 *
+		 * @param user
+		 */
 		@Override
 		public void check(UserDetails user) {
+			// TODO: 检查user账号是否已经被锁定，如果被锁定了，抛出个锁定了的异常
 			if (!user.isAccountNonLocked()) {
 				AbstractUserDetailsAuthenticationProvider.this.logger
 						.debug("Failed to authenticate since user account is locked");
 				throw new LockedException(AbstractUserDetailsAuthenticationProvider.this.messages
 						.getMessage("AbstractUserDetailsAuthenticationProvider.locked", "User account is locked"));
 			}
+			// TODO: 判断账号是否enabled的，如果不是enable的，那也抛出个异常
 			if (!user.isEnabled()) {
 				AbstractUserDetailsAuthenticationProvider.this.logger
 						.debug("Failed to authenticate since user account is disabled");
 				throw new DisabledException(AbstractUserDetailsAuthenticationProvider.this.messages
 						.getMessage("AbstractUserDetailsAuthenticationProvider.disabled", "User is disabled"));
 			}
+			// TODO: 判断账号是否过期了
 			if (!user.isAccountNonExpired()) {
 				AbstractUserDetailsAuthenticationProvider.this.logger
 						.debug("Failed to authenticate since user account has expired");

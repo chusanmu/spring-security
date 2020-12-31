@@ -83,13 +83,17 @@ public class SessionManagementFilter extends GenericFilterBean {
 
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: 如果 __spring_security_session_mgmt_filter_applied 这个属性不为空，则说明已经走过这个过滤器了，直接下一个
 		if (request.getAttribute(FILTER_APPLIED) != null) {
 			chain.doFilter(request, response);
 			return;
 		}
 		request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
+		// TODO: 如果当前securityContextRepository不包括这个request，直接执行下一个过滤器了
 		if (!this.securityContextRepository.containsContext(request)) {
+			// TODO: 拿到 authentication 认证信息
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			// TODO: 如果不为空，并且也不是匿名用户才处理
 			if (authentication != null && !this.trustResolver.isAnonymous(authentication)) {
 				// The user has been authenticated during the current request, so call the
 				// session strategy
@@ -100,12 +104,14 @@ public class SessionManagementFilter extends GenericFilterBean {
 					// The session strategy can reject the authentication
 					this.logger.debug("SessionAuthenticationStrategy rejected the authentication object", ex);
 					SecurityContextHolder.clearContext();
+					// TODO: 认知失败handler再次回调
 					this.failureHandler.onAuthenticationFailure(request, response, ex);
 					return;
 				}
 				// Eagerly save the security context to make it available for any possible
 				// re-entrant requests which may occur before the current request
 				// completes. SEC-1396.
+				// TODO: 进行存储当前安全上下文
 				this.securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 			}
 			else {

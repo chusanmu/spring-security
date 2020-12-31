@@ -44,6 +44,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: security中定义的事件发布器，可以发布认证成功和认证失败事件
+ *
  * The default strategy for publishing authentication events.
  * <p>
  * Maps well-known <tt>AuthenticationException</tt> types to events and publishes them via
@@ -77,6 +79,11 @@ public class DefaultAuthenticationEventPublisher
 		this(null);
 	}
 
+	/**
+	 * TODO: 每一个exception对应一个event
+	 *
+	 * @param applicationEventPublisher
+	 */
 	public DefaultAuthenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 		addMapping(BadCredentialsException.class.getName(), AuthenticationFailureBadCredentialsEvent.class);
@@ -93,6 +100,11 @@ public class DefaultAuthenticationEventPublisher
 				AuthenticationFailureBadCredentialsEvent.class);
 	}
 
+	/**
+	 * TODO: 发布认证成功事件
+	 *
+	 * @param authentication
+	 */
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
 		if (this.applicationEventPublisher != null) {
@@ -100,22 +112,32 @@ public class DefaultAuthenticationEventPublisher
 		}
 	}
 
+	/**
+	 * TODO: 发布认证失败事件
+	 *
+	 * @param exception
+	 * @param authentication
+	 */
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+		// TODO: 根据异常拿到一个event事件
 		Constructor<? extends AbstractAuthenticationEvent> constructor = getEventConstructor(exception);
 		AbstractAuthenticationEvent event = null;
 		if (constructor != null) {
 			try {
+				// TODO: 创建一个event
 				event = constructor.newInstance(authentication, exception);
 			}
 			catch (IllegalAccessException | InvocationTargetException | InstantiationException ignored) {
 			}
 		}
+		// TODO: event不为空，则发布出去
 		if (event != null) {
 			if (this.applicationEventPublisher != null) {
 				this.applicationEventPublisher.publishEvent(event);
 			}
 		}
+		// TODO: 否则打个log
 		else {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("No event was found for the exception " + exception.getClass().getName());
@@ -198,6 +220,11 @@ public class DefaultAuthenticationEventPublisher
 		}
 	}
 
+	/**
+	 * TODO: 添加了一个映射，每一个exception对应了一个失败事件
+	 * @param exceptionClass
+	 * @param eventClass
+	 */
 	private void addMapping(String exceptionClass, Class<? extends AbstractAuthenticationFailureEvent> eventClass) {
 		try {
 			Constructor<? extends AbstractAuthenticationEvent> constructor = eventClass

@@ -40,6 +40,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 /**
+ * TODO: 在非boot环境下，比如spring mvc环境下，在tomcat启动时，会进行回调initializer 这时候会去执行onStartup方法
  * Registers the {@link DelegatingFilterProxy} to use the springSecurityFilterChain before
  * any other registered {@link Filter}. When used with
  * {@link #AbstractSecurityWebApplicationInitializer(Class...)}, it will also register a
@@ -112,6 +113,7 @@ public abstract class AbstractSecurityWebApplicationInitializer implements WebAp
 			servletContext.addListener("org.springframework.security.web.session.HttpSessionEventPublisher");
 		}
 		servletContext.setSessionTrackingModes(getSessionTrackingModes());
+		// TODO: 初始化DelegatingFilterProxy ，然后将filter添加至servletContext中
 		insertSpringSecurityFilterChain(servletContext);
 		afterSpringSecurityFilterChain(servletContext);
 	}
@@ -131,12 +133,14 @@ public abstract class AbstractSecurityWebApplicationInitializer implements WebAp
 	 * @param servletContext the {@link ServletContext}
 	 */
 	private void insertSpringSecurityFilterChain(ServletContext servletContext) {
+		// TODO: 创建springSecurityFilterChain，添加一个DelegatingFilterProxy filter，其真实的filter的beanName为DEFAULT_FILTER_NAME
 		String filterName = DEFAULT_FILTER_NAME;
 		DelegatingFilterProxy springSecurityFilterChain = new DelegatingFilterProxy(filterName);
 		String contextAttribute = getWebApplicationContextAttribute();
 		if (contextAttribute != null) {
 			springSecurityFilterChain.setContextAttribute(contextAttribute);
 		}
+		// TODO: 注册filter
 		registerFilter(servletContext, true, filterName, springSecurityFilterChain);
 	}
 

@@ -78,6 +78,7 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: FilterInvocation 封装了 request, response, 以及过滤器链
 		invoke(new FilterInvocation(request, response, chain));
 	}
 
@@ -99,6 +100,13 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 		return FilterInvocation.class;
 	}
 
+	/**
+	 * 执行过滤器方法
+	 *
+	 * @param filterInvocation
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	public void invoke(FilterInvocation filterInvocation) throws IOException, ServletException {
 		if (isApplied(filterInvocation) && this.observeOncePerRequest) {
 			// filter already applied to this request and user wants us to observe
@@ -110,8 +118,10 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 		if (filterInvocation.getRequest() != null && this.observeOncePerRequest) {
 			filterInvocation.getRequest().setAttribute(FILTER_APPLIED, Boolean.TRUE);
 		}
+		// TODO: 在执行之前 进行权限验证
 		InterceptorStatusToken token = super.beforeInvocation(filterInvocation);
 		try {
+			// TODO: 往下调用
 			filterInvocation.getChain().doFilter(filterInvocation.getRequest(), filterInvocation.getResponse());
 		}
 		finally {

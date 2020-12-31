@@ -49,6 +49,7 @@ class InitializeUserDetailsBeanManagerConfigurer extends GlobalAuthenticationCon
 
 	@Override
 	public void init(AuthenticationManagerBuilder auth) throws Exception {
+		// TODO: 添加一个 InitializeUserDetailsManagerConfigurer
 		auth.apply(new InitializeUserDetailsManagerConfigurer());
 	}
 
@@ -59,13 +60,17 @@ class InitializeUserDetailsBeanManagerConfigurer extends GlobalAuthenticationCon
 			if (auth.isConfigured()) {
 				return;
 			}
+			// TODO: 尝试从容器中获取userDetails
 			UserDetailsService userDetailsService = getBeanOrNull(UserDetailsService.class);
+			// TODO: 容器中不存在userDetailsService，直接返回掉
 			if (userDetailsService == null) {
 				return;
 			}
+			// TODO: 获取passwordEncoder 以及passwordService
 			PasswordEncoder passwordEncoder = getBeanOrNull(PasswordEncoder.class);
 			UserDetailsPasswordService passwordManager = getBeanOrNull(UserDetailsPasswordService.class);
 			DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+			// TODO: 设置userDetailsService
 			provider.setUserDetailsService(userDetailsService);
 			if (passwordEncoder != null) {
 				provider.setPasswordEncoder(passwordEncoder);
@@ -74,6 +79,7 @@ class InitializeUserDetailsBeanManagerConfigurer extends GlobalAuthenticationCon
 				provider.setUserDetailsPasswordService(passwordManager);
 			}
 			provider.afterPropertiesSet();
+			// TODO: 添加 AuthenticationProvider
 			auth.authenticationProvider(provider);
 		}
 

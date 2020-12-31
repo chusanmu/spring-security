@@ -22,6 +22,8 @@ import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * TODO: security过滤器链
+ *
  * Defines a filter chain which is capable of being matched against an
  * {@code HttpServletRequest}. in order to decide whether it applies to that request.
  * <p>
@@ -32,8 +34,19 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface SecurityFilterChain {
 
+	/**
+	 * TODO: 判断是否匹配
+	 *
+	 * @param request
+	 * @return
+	 */
 	boolean matches(HttpServletRequest request);
 
+	/**
+	 * TODO: 获取它的所有的filter
+	 *
+	 * @return
+	 */
 	List<Filter> getFilters();
 
 }

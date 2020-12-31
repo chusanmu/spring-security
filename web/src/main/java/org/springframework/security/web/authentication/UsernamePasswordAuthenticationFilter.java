@@ -29,6 +29,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 
 /**
+ * TODO:  表单认证时 添加进来的一个Filter，进行认证, 第6个过滤器
  * Processes an authentication form submission. Called
  * {@code AuthenticationProcessingFilter} prior to Spring Security 3.0.
  * <p>
@@ -47,8 +48,14 @@ import org.springframework.util.Assert;
  */
 public class UsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+	/**
+	 * TODO: 默认的参数名 username
+	 */
 	public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "username";
 
+	/**
+	 * TODO: 默认的密码的参数
+	 */
 	public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "password";
 
 	private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/login",
@@ -71,17 +78,22 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
+		// TODO: 如果必须是Post请求，如果非post请求，直接抛出异常，默认只支持post请求
 		if (this.postOnly && !request.getMethod().equals("POST")) {
 			throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
 		}
+		// TODO: 获取username
 		String username = obtainUsername(request);
 		username = (username != null) ? username : "";
 		username = username.trim();
+		// TODO: 获取密码 password
 		String password = obtainPassword(request);
 		password = (password != null) ? password : "";
+		// TODO: 创建一个 UsernamePasswordAuthenticationToken
 		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
 		// Allow subclasses to set the "details" property
 		setDetails(request, authRequest);
+		// TODO: 这时候去真正的认证
 		return this.getAuthenticationManager().authenticate(authRequest);
 	}
 

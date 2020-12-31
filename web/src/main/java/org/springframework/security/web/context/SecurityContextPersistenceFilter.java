@@ -32,6 +32,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ *  TODO: 这是spring security默认的第二个过滤器
+ *
  * Populates the {@link SecurityContextHolder} with information obtained from the
  * configured {@link SecurityContextRepository} prior to the request and stores it back in
  * the repository once the request has completed and clearing the context holder. By
@@ -80,23 +82,40 @@ public class SecurityContextPersistenceFilter extends GenericFilterBean {
 		doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
 	}
 
+	/**
+	 * TODO: 默认的第二个拦截
+	 *
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		// ensure that filter is only applied once per request
+		// TODO: 确保这个filter只执行了一次，去request上下文获取 __spring_security_scpf_applied 如果不为空，就说明已经走过这个方法了
 		if (request.getAttribute(FILTER_APPLIED) != null) {
+			// TODO: 直接走到下一个过滤器就好了
 			chain.doFilter(request, response);
 			return;
 		}
+		// TODO: 设置 FILTER_APPLIED 属性，表示已经过来这个过滤器了，然后下次判断直接就放行
 		request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
+		// TODO: 默认false
 		if (this.forceEagerSessionCreation) {
 			HttpSession session = request.getSession();
 			if (this.logger.isDebugEnabled() && session.isNew()) {
 				this.logger.debug(LogMessage.format("Created session %s eagerly", session.getId()));
 			}
 		}
+		// TODO: 封装了request和response
 		HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
+		// TODO: 会尝试从httpSessionSecurityContextRepository中去加载context, 会尝试从session中加载，如果没有就创建一个空的
+		// TODO: 维护了安全认证的用户信息
 		SecurityContext contextBeforeChainExecution = this.repo.loadContext(holder);
 		try {
+			// TODO: 默认采用threadLocal的方式去存储securityContext，没有经过其他的过滤器链 contextBeforeChainExecution 这个可能是个空的
 			SecurityContextHolder.setContext(contextBeforeChainExecution);
 			if (contextBeforeChainExecution.getAuthentication() == null) {
 				logger.debug("Set SecurityContextHolder to empty SecurityContext");
@@ -107,13 +126,18 @@ public class SecurityContextPersistenceFilter extends GenericFilterBean {
 							.debug(LogMessage.format("Set SecurityContextHolder to %s", contextBeforeChainExecution));
 				}
 			}
+			// TODO: 接着往下执行其他的过滤器
 			chain.doFilter(holder.getRequest(), holder.getResponse());
 		}
 		finally {
+			// TODO: 最后执行完了其他的过滤器后，会执行到这里，拿出来被其他过滤器更改过后的securityContext
 			SecurityContext contextAfterChainExecution = SecurityContextHolder.getContext();
 			// Crucial removal of SecurityContextHolder contents before anything else.
+			// TODO: 然后清空了securityContextHolder里面的内容
 			SecurityContextHolder.clearContext();
+			// TODO: 存储securityContext
 			this.repo.saveContext(contextAfterChainExecution, holder.getRequest(), holder.getResponse());
+			// TODO: 移除这个属性 __spring_security_scpf_applied ，已经执行完此过滤器了
 			request.removeAttribute(FILTER_APPLIED);
 			this.logger.debug("Cleared SecurityContextHolder to complete request");
 		}

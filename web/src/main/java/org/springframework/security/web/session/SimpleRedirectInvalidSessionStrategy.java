@@ -56,6 +56,7 @@ public final class SimpleRedirectInvalidSessionStrategy implements InvalidSessio
 		if (this.createNewSession) {
 			request.getSession();
 		}
+		// TODO: 重定向
 		this.redirectStrategy.sendRedirect(request, response, this.destinationUrl);
 	}
 
