@@ -34,6 +34,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 对于请求的方法，只允许白名单中的方法，也就是说，不是所有的Http请求方法都可以执行
  * <p>
  * A strict implementation of {@link HttpFirewall} that rejects any suspicious requests
  * with a {@link RequestRejectedException}.
@@ -480,6 +481,10 @@ public class StrictHttpFirewall implements HttpFirewall {
 		return new FirewalledResponse(response);
 	}
 
+	/**
+	 * http请求方法必须是DELETE, GET HEAD OPTIONS, PATCH POST 以及PUT中的一个，请求才能发送成功，否则的话，就会抛出requestRejectedException
+	 * @return
+	 */
 	private static Set<String> createDefaultAllowedHttpMethods() {
 		Set<String> result = new HashSet<>();
 		result.add(HttpMethod.DELETE.name());
@@ -525,6 +530,11 @@ public class StrictHttpFirewall implements HttpFirewall {
 		return false;
 	}
 
+	/**
+	 * TODO: 必须是可打印的ascii字符
+	 * @param uri
+	 * @return
+	 */
 	private static boolean containsOnlyPrintableAsciiCharacters(String uri) {
 		int length = uri.length();
 		for (int i = 0; i < length; i++) {

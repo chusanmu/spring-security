@@ -67,6 +67,10 @@ public class JdbcTokenRepositoryImpl extends JdbcDaoSupport implements Persisten
 		}
 	}
 
+	/**
+	 * TODO: 创建一个token信息
+	 * @param token
+	 */
 	@Override
 	public void createNewToken(PersistentRememberMeToken token) {
 		getJdbcTemplate().update(this.insertTokenSql, token.getUsername(), token.getSeries(), token.getTokenValue(),

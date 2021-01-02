@@ -479,6 +479,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		else {
 			defaultSessionAuthenticationStrategy = this.providedSessionAuthenticationStrategy;
 		}
+		// TODO: 如果开启了最大session并发控制，其实就是设置了 maximumSessions 不为空
 		if (isConcurrentSessionControlEnabled()) {
 			SessionRegistry sessionRegistry = getSessionRegistry(http);
 			ConcurrentSessionControlAuthenticationStrategy concurrentSessionControlStrategy = new ConcurrentSessionControlAuthenticationStrategy(
@@ -491,6 +492,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 					sessionRegistry);
 			registerSessionStrategy = postProcess(registerSessionStrategy);
 
+			// TODO: 这里放了三个策略
 			delegateStrategies.addAll(Arrays.asList(concurrentSessionControlStrategy,
 					defaultSessionAuthenticationStrategy, registerSessionStrategy));
 		}
@@ -506,6 +508,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		if (this.sessionRegistry == null) {
 			this.sessionRegistry = getBeanOrNull(SessionRegistry.class);
 		}
+		// TODO: 如果你容器没有配，这里就创建一个默认的给返回回去
 		if (this.sessionRegistry == null) {
 			SessionRegistryImpl sessionRegistry = new SessionRegistryImpl();
 			registerDelegateApplicationListener(http, sessionRegistry);

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * TODO: 请求防火墙
  * Interface which can be used to reject potentially dangerous requests and/or wrap them
  * to control their behaviour.
  * <p>

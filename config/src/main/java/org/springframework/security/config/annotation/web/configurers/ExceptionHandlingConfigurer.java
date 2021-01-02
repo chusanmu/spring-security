@@ -182,9 +182,11 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 
 	@Override
 	public void configure(H http) {
+		// TODO: AuthenticationEntryPoint 这个用来处理认证异常
 		AuthenticationEntryPoint entryPoint = getAuthenticationEntryPoint(http);
 		ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter(entryPoint,
 				getRequestCache(http));
+		// TODO: 这个用来处理授权异常
 		AccessDeniedHandler deniedHandler = getAccessDeniedHandler(http);
 		exceptionTranslationFilter.setAccessDeniedHandler(deniedHandler);
 		exceptionTranslationFilter = postProcess(exceptionTranslationFilter);

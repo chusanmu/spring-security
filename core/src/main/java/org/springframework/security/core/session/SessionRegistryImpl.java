@@ -73,6 +73,14 @@ public class SessionRegistryImpl implements SessionRegistry, ApplicationListener
 		return new ArrayList<>(this.principals.keySet());
 	}
 
+	/**
+	 * TODO: 获取当前用户的所有session，该方法在调用时，传递两个参数
+	 *
+	 * @param principal to locate sessions for (should never be <code>null</code>)
+	 * @param includeExpiredSessions if <code>true</code>, the returned sessions will also
+	 * include those that have expired for the principal
+	 * @return
+	 */
 	@Override
 	public List<SessionInformation> getAllSessions(Object principal, boolean includeExpiredSessions) {
 		Set<String> sessionsUsedByPrincipal = this.principals.get(principal);

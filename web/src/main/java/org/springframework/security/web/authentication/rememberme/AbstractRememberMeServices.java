@@ -121,21 +121,28 @@ public abstract class AbstractRememberMeServices
 	 */
 	@Override
 	public final Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
+		// TODO: 提取cookie, cookie的key默认是 remember-me
 		String rememberMeCookie = extractRememberMeCookie(request);
+		// TODO: 为空，就直接返回null了
 		if (rememberMeCookie == null) {
 			return null;
 		}
+
 		this.logger.debug("Remember-me cookie detected");
+		// TODO: cookie为空，直接 清了cookie
 		if (rememberMeCookie.length() == 0) {
 			this.logger.debug("Cookie was empty");
 			cancelCookie(request, response);
 			return null;
 		}
 		try {
+			// TODO: 解析cookie
 			String[] cookieTokens = decodeCookie(rememberMeCookie);
+			// TODO: 尝试自动登录
 			UserDetails user = processAutoLoginCookie(cookieTokens, request, response);
 			this.userDetailsChecker.check(user);
 			this.logger.debug("Remember-me cookie accepted");
+			// TODO: 认证成功
 			return createSuccessfulAuthentication(request, user);
 		}
 		catch (CookieTheftException ex) {
@@ -159,6 +166,7 @@ public abstract class AbstractRememberMeServices
 	}
 
 	/**
+	 * TODO: 找到名字为remember-me的 cookie
 	 * Locates the Spring Security remember me cookie in the request and returns its
 	 * value. The cookie is searched for by name and also by matching the context path to
 	 * the cookie path.
@@ -198,6 +206,7 @@ public abstract class AbstractRememberMeServices
 	}
 
 	/**
+	 * TODO: 解析 cookie
 	 * Decodes the cookie and splits it into a set of token strings using the ":"
 	 * delimiter.
 	 * @param cookieValue the value obtained from the submitted cookie
@@ -275,10 +284,12 @@ public abstract class AbstractRememberMeServices
 	@Override
 	public final void loginSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication successfulAuthentication) {
+		// TODO: 尝试从request参数中拿到 remember-me这个参数，如果拿到了，说明前端传了
 		if (!rememberMeRequested(request, this.parameter)) {
 			this.logger.debug("Remember-me login not requested.");
 			return;
 		}
+		// TODO: 登陆成功
 		onLoginSuccess(request, response, successfulAuthentication);
 	}
 
@@ -291,6 +302,8 @@ public abstract class AbstractRememberMeServices
 			Authentication successfulAuthentication);
 
 	/**
+	 * TODO: 其实就是判断请求入参中是否有remember-me
+	 *
 	 * Allows customization of whether a remember-me login has been requested. The default
 	 * is to return true if <tt>alwaysRemember</tt> is set or the configured parameter
 	 * name has been included in the request and is set to the value "true".
@@ -334,12 +347,14 @@ public abstract class AbstractRememberMeServices
 			HttpServletResponse response) throws RememberMeAuthenticationException, UsernameNotFoundException;
 
 	/**
+	 * TODO: 取消cookie
 	 * Sets a "cancel cookie" (with maxAge = 0) on the response to disable persistent
 	 * logins.
 	 */
 	protected void cancelCookie(HttpServletRequest request, HttpServletResponse response) {
 		this.logger.debug("Cancelling cookie");
 		Cookie cookie = new Cookie(this.cookieName, null);
+		// TODO: 设置存活年龄为0
 		cookie.setMaxAge(0);
 		cookie.setPath(getCookiePath(request));
 		if (this.cookieDomain != null) {

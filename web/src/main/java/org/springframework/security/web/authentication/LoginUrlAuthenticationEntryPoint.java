@@ -114,6 +114,8 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	}
 
 	/**
+	 * TODO: 其实就是重定向，重定向到登录页面，即当我们未登录就去访问一个需要登录才能访问的资源时，会自动重定向到登录页面
+	 *
 	 * Performs the redirect (or forward) to the login form URL.
 	 */
 	@Override

@@ -38,6 +38,7 @@ public class WebAuthenticationDetails implements Serializable {
 	private final String sessionId;
 
 	/**
+	 * TODO: 保存了登录用户的ip 以及 sessionId
 	 * Records the remote address and will also set the session Id if a session already
 	 * exists (it won't create one).
 	 * @param request that the authentication request was received from

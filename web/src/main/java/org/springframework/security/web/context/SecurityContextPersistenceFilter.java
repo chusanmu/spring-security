@@ -116,6 +116,7 @@ public class SecurityContextPersistenceFilter extends GenericFilterBean {
 		SecurityContext contextBeforeChainExecution = this.repo.loadContext(holder);
 		try {
 			// TODO: 默认采用threadLocal的方式去存储securityContext，没有经过其他的过滤器链 contextBeforeChainExecution 这个可能是个空的
+			// TODO: 这样就把从session中加载的用户认证信息拿到了，然后存到当前线程的threadLocal中
 			SecurityContextHolder.setContext(contextBeforeChainExecution);
 			if (contextBeforeChainExecution.getAuthentication() == null) {
 				logger.debug("Set SecurityContextHolder to empty SecurityContext");
@@ -133,9 +134,9 @@ public class SecurityContextPersistenceFilter extends GenericFilterBean {
 			// TODO: 最后执行完了其他的过滤器后，会执行到这里，拿出来被其他过滤器更改过后的securityContext
 			SecurityContext contextAfterChainExecution = SecurityContextHolder.getContext();
 			// Crucial removal of SecurityContextHolder contents before anything else.
-			// TODO: 然后清空了securityContextHolder里面的内容
+			// TODO: 然后清空了securityContextHolder里面的内容，这一步是很重要的，因为清空ThreadLocal，防止其他线程拿到了security context信息，产生脏读
 			SecurityContextHolder.clearContext();
-			// TODO: 存储securityContext
+			// TODO: 存储securityContext，存到sessiono中
 			this.repo.saveContext(contextAfterChainExecution, holder.getRequest(), holder.getResponse());
 			// TODO: 移除这个属性 __spring_security_scpf_applied ，已经执行完此过滤器了
 			request.removeAttribute(FILTER_APPLIED);

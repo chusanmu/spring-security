@@ -21,6 +21,7 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * TODO: 唯一实现，会被存在session中，作为value
  * Base implementation of {@link SecurityContext}.
  * <p>
  * Used by default by {@link SecurityContextHolder} strategies.
@@ -31,6 +32,9 @@ public class SecurityContextImpl implements SecurityContext {
 
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
+	/**
+	 * TODO: 用户认证之后的信息
+	 */
 	private Authentication authentication;
 
 	public SecurityContextImpl() {
@@ -55,6 +59,11 @@ public class SecurityContextImpl implements SecurityContext {
 		return false;
 	}
 
+	/**
+	 * 返回认证信息
+	 *
+	 * @return
+	 */
 	@Override
 	public Authentication getAuthentication() {
 		return this.authentication;

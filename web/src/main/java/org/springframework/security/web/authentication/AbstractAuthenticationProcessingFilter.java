@@ -226,11 +226,13 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 				// return immediately as subclass has indicated that it hasn't completed
 				return;
 			}
+			// TODO: 这个方法 就是去处理session的并发问题
 			this.sessionStrategy.onAuthentication(authenticationResult, request, response);
 			// Authentication success
 			if (this.continueChainBeforeSuccessfulAuthentication) {
 				chain.doFilter(request, response);
 			}
+			// TODO: 设置安全认证信息 remember-me设置 处理登录成功事件
 			successfulAuthentication(request, response, chain, authenticationResult);
 		}
 		catch (InternalAuthenticationServiceException failed) {
@@ -312,14 +314,17 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	 */
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
+		// TODO: 成功登陆，设置authentication
 		SecurityContextHolder.getContext().setAuthentication(authResult);
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug(LogMessage.format("Set SecurityContextHolder to %s", authResult));
 		}
+		// TODO: 使用rememberMeServices去处理登陆成功的事件
 		this.rememberMeServices.loginSuccess(request, response, authResult);
 		if (this.eventPublisher != null) {
 			this.eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, this.getClass()));
 		}
+		// TODO: 处理登陆成功事件
 		this.successHandler.onAuthenticationSuccess(request, response, authResult);
 	}
 

@@ -31,6 +31,8 @@ package org.springframework.security.config.annotation;
 public interface SecurityConfigurer<O, B extends SecurityBuilder<O>> {
 
 	/**
+	 * TODO: 用来做初始化操作
+	 *
 	 * Initialize the {@link SecurityBuilder}. Here only shared state should be created
 	 * and modified, but not properties on the {@link SecurityBuilder} used for building
 	 * the object. This ensures that the {@link #configure(SecurityBuilder)} method uses
@@ -41,6 +43,8 @@ public interface SecurityConfigurer<O, B extends SecurityBuilder<O>> {
 	void init(B builder) throws Exception;
 
 	/**
+	 * TODO: 用来做具体的配置
+	 *
 	 * Configure the {@link SecurityBuilder} by setting the necessary properties on the
 	 * {@link SecurityBuilder}.
 	 * @param builder

@@ -62,12 +62,14 @@ final class AutowireBeanFactoryObjectPostProcessor
 		}
 		T result = null;
 		try {
+			// TODO: 将你的对象走一遍 bean的生命周期
 			result = (T) this.autowireBeanFactory.initializeBean(object, object.toString());
 		}
 		catch (RuntimeException ex) {
 			Class<?> type = object.getClass();
 			throw new RuntimeException("Could not postProcess " + object + " of type " + type, ex);
 		}
+		// TODO: 对bean中的每一个属性进行注入
 		this.autowireBeanFactory.autowireBean(object);
 		if (result instanceof DisposableBean) {
 			this.disposableBeans.add((DisposableBean) result);

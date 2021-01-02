@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 一种组合模式吧 算是，将几种session认证策略组合起来
  * A {@link SessionAuthenticationStrategy} that accepts multiple
  * {@link SessionAuthenticationStrategy} implementations to delegate to. Each
  * {@link SessionAuthenticationStrategy} is invoked in turn. The invocations are short
@@ -74,6 +75,7 @@ public class CompositeSessionAuthenticationStrategy implements SessionAuthentica
 			HttpServletResponse response) throws SessionAuthenticationException {
 		int currentPosition = 0;
 		int size = this.delegateStrategies.size();
+		// TODO: 执行这几种策略
 		for (SessionAuthenticationStrategy delegate : this.delegateStrategies) {
 			if (this.logger.isTraceEnabled()) {
 				this.logger.trace(LogMessage.format("Preparing session with %s (%d/%d)",

@@ -39,6 +39,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * TODO: 和记住我有关的一个Filter
  * Detects if there is no {@code Authentication} object in the {@code SecurityContext},
  * and populates the context with a remember-me authentication token if a
  * {@link RememberMeServices} implementation so requests.
@@ -64,10 +65,19 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 public class RememberMeAuthenticationFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
 
+	/**
+	 * 事件发布器
+	 */
 	private ApplicationEventPublisher eventPublisher;
 
+	/**
+	 * TODO: 认证成功处理器
+	 */
 	private AuthenticationSuccessHandler successHandler;
 
+	/**
+	 * TODO: 认证管理器
+	 */
 	private AuthenticationManager authenticationManager;
 
 	private RememberMeServices rememberMeServices;
@@ -94,6 +104,7 @@ public class RememberMeAuthenticationFilter extends GenericFilterBean implements
 
 	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		// TODO: 当一个请求过来，当安全管理器中已经不为空了，说明它已经被认证完了，直接下一个filter就可以了
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
 			this.logger.debug(LogMessage
 					.of(() -> "SecurityContextHolder not populated with remember-me token, as it already contained: '"
@@ -101,6 +112,7 @@ public class RememberMeAuthenticationFilter extends GenericFilterBean implements
 			chain.doFilter(request, response);
 			return;
 		}
+		// TODO: 使用rememberMeService进行自动登录
 		Authentication rememberMeAuth = this.rememberMeServices.autoLogin(request, response);
 		if (rememberMeAuth != null) {
 			// Attempt authenticaton via AuthenticationManager

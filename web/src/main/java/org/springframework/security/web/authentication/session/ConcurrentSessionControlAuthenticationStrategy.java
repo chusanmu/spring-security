@@ -95,22 +95,30 @@ public class ConcurrentSessionControlAuthenticationStrategy
 	public void onAuthentication(Authentication authentication, HttpServletRequest request,
 			HttpServletResponse response) {
 		int allowedSessions = getMaximumSessionsForThisUser(authentication);
+		// TODO: 如果allowedSessions的值为-1 表示对session数量不做任何限制
 		if (allowedSessions == -1) {
 			// We permit unlimited logins
 			return;
 		}
+		// TODO: 获取当前用户的所有的session, false表示不包含已经过期的session, 用户登录成功后，会将用户的sessionId存起来，其中key是用户的主体
+		// TODO: value则是该主题对应的sessionId组成的集合
 		List<SessionInformation> sessions = this.sessionRegistry.getAllSessions(authentication.getPrincipal(), false);
+		// TODO: 接下来计算出当前的用户已经有几个有效地session了，同时获取允许的session并发数
 		int sessionCount = sessions.size();
+		// TODO: 如果当前session数 小于 session并发数(allowedSessions)，则不做处理，如果allowedSessions的值为-1,表示不限制
 		if (sessionCount < allowedSessions) {
 			// They haven't got too many login sessions running at present
 			return;
 		}
+		// TODO: 如果当前session数 sessionCount等于session并发数，那么就先看看当前session是否不为null, 并且已经存在于sessions中了，如果已经存在了
+		// TODO: 那就是自家人了，不做任何处理，如果当前session不为空，那么意味着将有一个新的session被创建出来，届时当前session数 sessionCount 就会超过session并发数 allowedSessions
 		if (sessionCount == allowedSessions) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
 				// Only permit it though if this request is associated with one of the
 				// already registered sessions
 				for (SessionInformation si : sessions) {
+					// TODO: 如果已经存在于当前session中 直接return掉
 					if (si.getSessionId().equals(session.getId())) {
 						return;
 					}
@@ -118,6 +126,7 @@ public class ConcurrentSessionControlAuthenticationStrategy
 			}
 			// If the session is null, a new one will be created by the parent class,
 			// exceeding the allowed number
+			// TODO: 如果会话为空，则父类将创建一个新会话，超过允许的数量
 		}
 		allowableSessionsExceeded(sessions, allowedSessions, this.sessionRegistry);
 	}
@@ -144,16 +153,20 @@ public class ConcurrentSessionControlAuthenticationStrategy
 	 */
 	protected void allowableSessionsExceeded(List<SessionInformation> sessions, int allowableSessions,
 			SessionRegistry registry) throws SessionAuthenticationException {
+		// TODO: exceptionIfMaximumExceeded 默认为false，可以配置成true，就直接抛出异常了，不允许多个session同时登陆
 		if (this.exceptionIfMaximumExceeded || (sessions == null)) {
 			throw new SessionAuthenticationException(
 					this.messages.getMessage("ConcurrentSessionControlAuthenticationStrategy.exceededAllowed",
 							new Object[] { allowableSessions }, "Maximum sessions of {0} for this principal exceeded"));
 		}
 		// Determine least recently used sessions, and mark them for invalidation
+		// TODO: 对sessions按照请求时间进行排序，然后再使多余的session过期即可
 		sessions.sort(Comparator.comparing(SessionInformation::getLastRequest));
 		int maximumSessionsExceededBy = sessions.size() - allowableSessions + 1;
+		// TODO: 使多余的session过期, 排完序后，最新的在后面，时间最大的在后面
 		List<SessionInformation> sessionsToBeExpired = sessions.subList(0, maximumSessionsExceededBy);
 		for (SessionInformation session : sessionsToBeExpired) {
+			// TODO:
 			session.expireNow();
 		}
 	}

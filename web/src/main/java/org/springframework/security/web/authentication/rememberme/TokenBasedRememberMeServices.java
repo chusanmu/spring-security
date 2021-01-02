@@ -87,6 +87,14 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 		super(key, userDetailsService);
 	}
 
+	/**
+	 * TODO: 处理自动登录检查
+	 *
+	 * @param cookieTokens the decoded and tokenized cookie value
+	 * @param request the request
+	 * @param response the response, to allow the cookie to be modified if required.
+	 * @return
+	 */
 	@Override
 	protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -94,6 +102,7 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 			throw new InvalidCookieException(
 					"Cookie token did not contain 3" + " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
 		}
+		// TODO: 获取过期时间，看看有没有过期
 		long tokenExpiryTime = getTokenExpiryTime(cookieTokens);
 		if (isTokenExpired(tokenExpiryTime)) {
 			throw new InvalidCookieException("Cookie token[1] has expired (expired on '" + new Date(tokenExpiryTime)
@@ -101,7 +110,9 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 		}
 		// Check the user exists. Defer lookup until after expiry time checked, to
 		// possibly avoid expensive database call.
+		// TODO: 使用userDetailsService来进行加载用户
 		UserDetails userDetails = getUserDetailsService().loadUserByUsername(cookieTokens[0]);
+		// TODO: userDetails不能为空，为空就打印个日志
 		Assert.notNull(userDetails, () -> "UserDetailsService " + getUserDetailsService()
 				+ " returned null for username " + cookieTokens[0] + ". " + "This is an interface contract violation");
 		// Check signature of token matches remaining details. Must do this after user
@@ -110,8 +121,10 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 		// only called once per HttpSession - if the token is valid, it will cause
 		// SecurityContextHolder population, whilst if invalid, will cause the cookie to
 		// be cancelled.
+		// TODO: 使用和保存时相同的算法 md5 进行加密密码
 		String expectedTokenSignature = makeTokenSignature(tokenExpiryTime, userDetails.getUsername(),
 				userDetails.getPassword());
+		// TODO: 使用加密后的密码和客户端cookie传过来的密码进行比对，如果不成功，抛出异常
 		if (!equals(expectedTokenSignature, cookieTokens[2])) {
 			throw new InvalidCookieException("Cookie token[2] contained signature '" + cookieTokens[2]
 					+ "' but expected '" + expectedTokenSignature + "'");
@@ -134,8 +147,11 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 	 * ("username:tokenExpiryTime:password:key")
 	 */
 	protected String makeTokenSignature(long tokenExpiryTime, String username, String password) {
+		// TODO: 使用用户名 密码和一个过期时间 加一个key来做成cookie的value, 这里拿到了一个key， 默认的key其实是一个UUID，随机字符串
+		// TODO: 所以这时候可能会出现一个问题，就是当服务器重启时，会重新生成一个key，这时候就变了，导致还得重新登录，所以可以在配置中指定一个key
 		String data = username + ":" + tokenExpiryTime + ":" + password + ":" + getKey();
 		try {
+			// TODO: 使用md5进行加密
 			MessageDigest digest = MessageDigest.getInstance("MD5");
 			return new String(Hex.encode(digest.digest(data.getBytes())));
 		}
@@ -151,16 +167,20 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 	@Override
 	public void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication successfulAuthentication) {
+		// TODO: 拿到登陆成功的 username 和 password
 		String username = retrieveUserName(successfulAuthentication);
 		String password = retrievePassword(successfulAuthentication);
 		// If unable to find a username and password, just abort as
 		// TokenBasedRememberMeServices is
 		// unable to construct a valid token in this case.
+		// TODO: 如果username为空
 		if (!StringUtils.hasLength(username)) {
 			this.logger.debug("Unable to retrieve username");
 			return;
 		}
+		// TODO: 如果密码为空，这时候去加载密码
 		if (!StringUtils.hasLength(password)) {
+			// TODO: 使用userDetailsService 去加载
 			UserDetails user = getUserDetailsService().loadUserByUsername(username);
 			password = user.getPassword();
 			if (!StringUtils.hasLength(password)) {
@@ -168,11 +188,14 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 				return;
 			}
 		}
+		// TODO: 默认存储两个星期
 		int tokenLifetime = calculateLoginLifetime(request, successfulAuthentication);
 		long expiryTime = System.currentTimeMillis();
 		// SEC-949
 		expiryTime += 1000L * ((tokenLifetime < 0) ? TWO_WEEKS_S : tokenLifetime);
+		// TODO: 创建 signatureValue 之后要存到cookie中
 		String signatureValue = makeTokenSignature(expiryTime, username, password);
+		// TODO: 向客户端设置cookie
 		setCookie(new String[] { username, Long.toString(expiryTime), signatureValue }, tokenLifetime, request,
 				response);
 		if (this.logger.isDebugEnabled()) {

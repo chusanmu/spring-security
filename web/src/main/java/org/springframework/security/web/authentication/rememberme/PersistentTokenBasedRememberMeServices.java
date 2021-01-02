@@ -98,14 +98,18 @@ public class PersistentTokenBasedRememberMeServices extends AbstractRememberMeSe
 			throw new InvalidCookieException("Cookie token did not contain " + 2 + " tokens, but contained '"
 					+ Arrays.asList(cookieTokens) + "'");
 		}
+		// TODO: 从前端传来的cookie中解析出series和token
 		String presentedSeries = cookieTokens[0];
 		String presentedToken = cookieTokens[1];
+		// TODO: 根据series从数据库中查询出一个PersistentRememberMeToken实例
 		PersistentRememberMeToken token = this.tokenRepository.getTokenForSeries(presentedSeries);
+		// TODO: token为空，直接报错
 		if (token == null) {
 			// No series match, so we can't authenticate using this cookie
 			throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
 		}
 		// We have a match for this user/series combination
+		// TODO: token不同，说明账号可能被人盗用，进行移除相关的token
 		if (!presentedToken.equals(token.getTokenValue())) {
 			// Token doesn't match series value. Delete all logins for this user and throw
 			// an exception to warn them.
@@ -119,6 +123,7 @@ public class PersistentTokenBasedRememberMeServices extends AbstractRememberMeSe
 		}
 		// Token also matches, so login is valid. Update the token value, keeping the
 		// *same* series number.
+		// TODO: 新的会话会对应一个新的token
 		this.logger.debug(LogMessage.format("Refreshing persistent login token for user '%s', series '%s'",
 				token.getUsername(), token.getSeries()));
 		PersistentRememberMeToken newToken = new PersistentRememberMeToken(token.getUsername(), token.getSeries(),
@@ -147,7 +152,9 @@ public class PersistentTokenBasedRememberMeServices extends AbstractRememberMeSe
 		PersistentRememberMeToken persistentToken = new PersistentRememberMeToken(username, generateSeriesData(),
 				generateTokenData(), new Date());
 		try {
+			// TODO: 此处可以存储token信息至db或者是内存
 			this.tokenRepository.createNewToken(persistentToken);
+			// TODO: 添加了series和token
 			addCookie(persistentToken, request, response);
 		}
 		catch (Exception ex) {
@@ -169,6 +176,11 @@ public class PersistentTokenBasedRememberMeServices extends AbstractRememberMeSe
 		return new String(Base64.getEncoder().encode(newSeries));
 	}
 
+	/**
+	 * TODO: 生成一个16字节的随机token
+	 *
+	 * @return
+	 */
 	protected String generateTokenData() {
 		byte[] newToken = new byte[this.tokenLength];
 		this.random.nextBytes(newToken);

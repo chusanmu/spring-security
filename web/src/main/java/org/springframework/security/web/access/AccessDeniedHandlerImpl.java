@@ -50,6 +50,15 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
 	private String errorPage;
 
+	/**
+	 * TODO: 其实就是向客户端返回403错误
+	 * 
+	 * @param request that resulted in an <code>AccessDeniedException</code>
+	 * @param response so that the user agent can be advised of the failure
+	 * @param accessDeniedException that caused the invocation
+	 * @throws IOException
+	 * @throws ServletException
+	 */
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {

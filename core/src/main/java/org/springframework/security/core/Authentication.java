@@ -24,6 +24,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
+ * TODO: 用来保存我们的登录用户信息
  * Represents the token for an authentication request or for an authenticated principal
  * once the request has been processed by the
  * {@link AuthenticationManager#authenticate(Authentication)} method.
@@ -51,6 +52,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public interface Authentication extends Principal, Serializable {
 
 	/**
+	 * TODO: 用来获取用户的权限
+	 *
 	 * Set by an <code>AuthenticationManager</code> to indicate the authorities that the
 	 * principal has been granted. Note that classes should not rely on this value as
 	 * being valid unless it has been set by a trusted <code>AuthenticationManager</code>.
@@ -65,6 +68,7 @@ public interface Authentication extends Principal, Serializable {
 	Collection<? extends GrantedAuthority> getAuthorities();
 
 	/**
+	 * TODO: 用来获取用户凭证，一般而言就是密码
 	 * The credentials that prove the principal is correct. This is usually a password,
 	 * but could be anything relevant to the <code>AuthenticationManager</code>. Callers
 	 * are expected to populate the credentials.
@@ -73,6 +77,7 @@ public interface Authentication extends Principal, Serializable {
 	Object getCredentials();
 
 	/**
+	 * TODO: 用户携带的详细信息，可能是当前请求之类的东西
 	 * Stores additional details about the authentication request. These might be an IP
 	 * address, certificate serial number etc.
 	 * @return additional details about the authentication request, or <code>null</code>
@@ -81,6 +86,7 @@ public interface Authentication extends Principal, Serializable {
 	Object getDetails();
 
 	/**
+	 * TODO: 用来获取当前用户，可能是个用户名，也可能是当前的请求之类的东西
 	 * The identity of the principal being authenticated. In the case of an authentication
 	 * request with username and password, this would be the username. Callers are
 	 * expected to populate the principal for an authentication request.
@@ -95,6 +101,8 @@ public interface Authentication extends Principal, Serializable {
 	Object getPrincipal();
 
 	/**
+	 * TODO: 当前用户是否认证成功
+	 *
 	 * Used to indicate to {@code AbstractSecurityInterceptor} whether it should present
 	 * the authentication token to the <code>AuthenticationManager</code>. Typically an
 	 * <code>AuthenticationManager</code> (or, more often, one of its
